@@ -1,12 +1,2 @@
-import React from 'react';
-import MemoComponent from './components/Memo';
-
-const App: React.FC = () => {
-    return (
-        <div className="App">
-            <MemoComponent />
-        </div>
-    );
-}
-
-export default App;
+import React, { useState } from 'react';
+import MemoForm from './components/MemoForm';

@@ -1,38 +1,65 @@
-// src/components/ClaimForm.tsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import ResultDisplay from './ResultDisplay';
 
-const ClaimForm: React.FC = () => {
-    const [claim, setClaim] = useState('');
-    const [result, setResult] = useState('');
+interface Memo {
+    id: number;
+    title: string;
+    content: string;
+    created_at: string;
+}
 
-    const handleSubmit = async (event: React.FormEvent) => {
-        event.preventDefault();
+interface MemoFormProps {
+    memos: Memo[];
+    setMemos: React.Dispatch<React.SetStateAction<Memo[]>>;
+}
+
+const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const newMemo = { title, content };
+
         try {
-            const response = await axios.post('http://localhost:8000/api/verify_claim/', { claim });
-            setResult(response.data.result);
+            const response = await axios.post('http://localhost:8000/api/memos/', newMemo, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log('Memo created:', response.data);
+            setMemos([response.data, ...memos]); // 更新memo列表
+            setTitle('');
+            setContent('');
         } catch (error) {
-            console.error("Error verifying claim", error);
+            console.error('There was an error creating the memo!', error);
         }
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Enter your claim:
-                    <input
-                        type="text"
-                        value={claim}
-                        onChange={(e) => setClaim(e.target.value)}
-                    />
-                </label>
-                <button type="submit">Submit</button>
-            </form>
-            {result && <ResultDisplay result={result} />}
-        </div>
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10 p-4 bg-white rounded shadow">
+            <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">Title:</label>
+                <input 
+                    id="title"
+                    type="text" 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)} 
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+            </div>
+            <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="content">Content:</label>
+                <textarea 
+                    id="content"
+                    value={content} 
+                    onChange={(e) => setContent(e.target.value)} 
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+            </div>
+            <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Memo</button>
+        </form>
     );
 };
 
-export default ClaimForm;
+export default MemoForm;

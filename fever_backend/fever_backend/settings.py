@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
+import openai
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +33,22 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+
+
+# 初始化环境变量
+env = environ.Env(
+    # 设置默认值
+    DEBUG=(bool, False)
+)
+
+# 读取 .env 文件
+environ.Env.read_env()
+
+# 设置环境变量
+OPENAI_API_KEY = env('OPENAI_API_KEY')
+
+# 配置 OpenAI API 密钥
+openai.api_key = OPENAI_API_KEY
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,6 +74,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 
 ROOT_URLCONF = 'fever_backend.urls'
 
