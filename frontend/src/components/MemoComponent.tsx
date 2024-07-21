@@ -7,6 +7,7 @@ interface Memo {
     title: string;
     content: string;
     openai_response: string;
+    parameter: string;
     created_at: string;
 }
 
@@ -18,7 +19,11 @@ interface MemoComponentProps {
 const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
     useEffect(() => {
         axios.get('http://localhost:8000/api/memos/')
-            .then(response => setMemos(response.data))
+            .then(response => {
+                // Sort memos by created_at in descending order
+                const sortedMemos = response.data.sort((a: Memo, b: Memo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                setMemos(sortedMemos);
+            })
             .catch(error => console.log(error));
     }, [setMemos]);
 
@@ -40,9 +45,10 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                         <h2 className="text-xl font-bold">{memo.title}</h2>
                         <h3 className="mb-2">{memo.content}</h3>
                         <ReactMarkdown className="text-sm text-gray-500">{memo.openai_response}</ReactMarkdown>
+                        <p className="text-sm text-gray-500 mt-2">Parameter: {memo.parameter}</p>
                         <button
                             onClick={() => handleDelete(memo.id)}
-                            className="text-red-500 hover:underline"
+                            className="text-red-500 hover:underline mt-2"
                         >
                             Delete
                         </button>

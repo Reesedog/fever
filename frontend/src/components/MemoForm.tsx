@@ -6,6 +6,7 @@ interface Memo {
     title: string;
     content: string;
     openai_response: string;
+    parameter: string;
     created_at: string;
 }
 
@@ -15,7 +16,7 @@ interface MemoFormProps {
 }
 
 const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState('Test');
     const [content, setContent] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +31,7 @@ const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
             });
             console.log('Memo created:', response.data);
             setMemos([response.data, ...memos]); // 更新Memo列表
-            setTitle('');
+            setTitle('Test');
             setContent('');
         } catch (error) {
             console.error('There was an error creating the memo!', error);

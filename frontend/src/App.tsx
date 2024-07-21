@@ -7,6 +7,7 @@ interface Memo {
     title: string;
     content: string;
     openai_response: string;
+    parameter: string;
     created_at: string;
 }
 

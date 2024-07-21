@@ -28,8 +28,12 @@ class MemoViewSet(viewsets.ModelViewSet):
  
         # 创建助手
         assistant = client.beta.assistants.create(
-            name="Financial Analyst Assistant",
-            instructions="You are an assistant that helps forming NDIS support plans. User will give you information about their disability. Then you should gather the related item and budget amount ($) and provide a formated support plan. The format should include support item and its budget amount. provide no more than 5 items.",
+            instructions="You are an assistant that helps forming NDIS support plans. "
+            "User will give you information about their disability. "
+            "Then you should gather the related item and budget amount ($) and provide a formated support plan. "
+            "The format should include support item and its budget amount. provide no more than 5 items."
+            "Be clear about the item and its associated budget amount. "
+            "Markdown format is strictly forbidden!!!!!",
             model="gpt-4o",
             tools=[{"type": "file_search"}],
         )
@@ -107,62 +111,64 @@ class MemoViewSet(viewsets.ModelViewSet):
             print(f"Error: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-        # 保存 Memo 对象
-        memo = Memo.objects.create(
-            title=title,
-            content=content,
-            openai_response=openai_text
-        )
         
-        assistant = client.beta.assistants.create(
-            name="Financial Analyst Assistant",
-            instructions="You are an assistant that uses the provided function to generate a organised support plan for NDIS participants. The catagory is the support item and the amount is the budget amount.",
+        assistant2 = client.beta.assistants.create(
+            instructions="You are an assistant that uses the provided function to generate an organised support plan. The items are the support items and the amounts are the budget amounts.",
             model="gpt-4-turbo",
-            tools=[{"type": "file_search"},
-                   {
+            tools=[
+                {"type": "file_search"},
+                {
                     "type": "function",
                     "function": {
                         "name": "get_support_plan",
-                        "description": "Get the first budget catagory and amount for ndis participant",
+                        "description": "Get the support items and amounts",
                         "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "catagory": {
-                            "type": "string",
-                            "description": "The support catagory"
+                            "type": "object",
+                            "properties": {
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "item": {
+                                                "type": "string",
+                                                "description": "The support item"
+                                            },
+                                            "amount": {
+                                                "type": "integer",
+                                                "description": "The budget amount"
+                                            }
+                                        },
+                                        "required": ["item", "amount"]
+                                    }
+                                }
                             },
-                            "amount": {
-                            "type": "integer",
-                            "description": "The budget amount"
-                            }
-                        },
-                        "required": ["catagory", "amount"]
+                            "required": ["items"]
                         }
                     }
-                    },
-                   ],
+                }
+            ],
         )
-        
-        assistant = client.beta.assistants.update(
-            assistant_id=assistant.id,
-            tool_resources={"file_search": {"vector_store_ids": ["vs_5iwLviwEL7Fjbtnzqwa8Ali2"]}},
-        )
+
+
         
         # 创建会话
         thread = client.beta.threads.create()
-        
+                
         # 发送消息到会话
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
             content=openai_text
         )
-
+        
+        parameter = ""
+        
         # 发送请求到 OpenAI API
         try:
             run = client.beta.threads.runs.create_and_poll(
                 thread_id=thread.id,
-                assistant_id=assistant.id,
+                assistant_id=assistant2.id,
             )
             
             print("\n\n\n")
@@ -172,14 +178,24 @@ class MemoViewSet(viewsets.ModelViewSet):
                 for tool in run.required_action.submit_tool_outputs.tool_calls:
                     if tool.function.name == "get_support_plan":
                         print(tool.function.arguments)
+                        parameter = tool.function.arguments
         except Exception as e:
             print(f"Error: {e}")
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        # 保存 Memo 对象
+        memo = Memo.objects.create(
+            title=title,
+            content=content,
+            openai_response=openai_text,
+            parameter=parameter
+        )
         
         # 序列化并返回响应
         result_serializer = MemoSerializer(memo)
         return Response(result_serializer.data, status=status.HTTP_201_CREATED)
+    
+    
 
 @csrf_exempt
 def delete_memo(request, memo_id):
