@@ -29,7 +29,7 @@ class MemoViewSet(viewsets.ModelViewSet):
         # 创建助手
         assistant = client.beta.assistants.create(
             name="Financial Analyst Assistant",
-            instructions="You are an assistant",
+            instructions="You are an assistant that helps forming NDIS support plans. User will give you information about their disability. Then you should gather the related item and budget amount ($) and provide a formated support plan. The format should include support item and its budget amount. provide no more than 5 items.",
             model="gpt-4o",
             tools=[{"type": "file_search"}],
         )
@@ -61,7 +61,7 @@ class MemoViewSet(viewsets.ModelViewSet):
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
-            content=f"Title: {title}\nContent: {content}\n"
+            content=f"Content: {content}\n"
         )
 
         # 发送请求到 OpenAI API
@@ -69,7 +69,6 @@ class MemoViewSet(viewsets.ModelViewSet):
             run = client.beta.threads.runs.create_and_poll(
                 thread_id=thread.id,
                 assistant_id=assistant.id,
-                instructions="You are an assistant"
             )
 
             if run.status == 'completed':
@@ -117,8 +116,8 @@ class MemoViewSet(viewsets.ModelViewSet):
         
         assistant = client.beta.assistants.create(
             name="Financial Analyst Assistant",
-            instructions="You are an assistant that uses the provided function to generate a organised support plan for NDIS participants.",
-            model="gpt-3.5-turbo",
+            instructions="You are an assistant that uses the provided function to generate a organised support plan for NDIS participants. The catagory is the support item and the amount is the budget amount.",
+            model="gpt-4-turbo",
             tools=[{"type": "file_search"},
                    {
                     "type": "function",
@@ -132,7 +131,7 @@ class MemoViewSet(viewsets.ModelViewSet):
                             "type": "string",
                             "description": "The support catagory"
                             },
-                            "unit": {
+                            "amount": {
                             "type": "integer",
                             "description": "The budget amount"
                             }

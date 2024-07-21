@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface Memo {
     id: number;
@@ -30,11 +31,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
         }
     };
 
-    const createMarkup = (text: string) => {
-        const formattedText = text.replace(/\n/g, '<br />');
-        return { __html: formattedText };
-    };
-
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Memos</h1>
@@ -42,9 +38,8 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                 {memos.map(memo => (
                     <li key={memo.id} className="mb-4 p-4 border rounded shadow">
                         <h2 className="text-xl font-bold">{memo.title}</h2>
-                        <div dangerouslySetInnerHTML={createMarkup(memo.content)} />
-                        <p className="text-sm text-gray-500">{memo.created_at}</p>
-                        <div className="text-sm text-gray-500" dangerouslySetInnerHTML={createMarkup(memo.openai_response)} />
+                        <h3 className="mb-2">{memo.content}</h3>
+                        <ReactMarkdown className="text-sm text-gray-500">{memo.openai_response}</ReactMarkdown>
                         <button
                             onClick={() => handleDelete(memo.id)}
                             className="text-red-500 hover:underline"
