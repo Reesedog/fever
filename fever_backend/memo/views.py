@@ -33,7 +33,9 @@ class MemoViewSet(viewsets.ModelViewSet):
             "Then you should gather the related item and budget amount ($) and provide a formated support plan. "
             "The format should include support item and its budget amount. provide no more than 5 items."
             "Be clear about the item and its associated budget amount. "
-            "Markdown format is strictly forbidden!!!!!",
+            "Markdown format is strictly forbidden!!!!!"
+            "////I repeat: Markdown format is strictly forbidden!!!!!////"
+            "do not use markdown format such as **, ##, etc.",
             model="gpt-4o",
             tools=[{"type": "file_search"}],
         )
