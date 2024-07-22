@@ -137,7 +137,7 @@ class MemoViewSet(viewsets.ModelViewSet):
                                                 "description": "The support item"
                                             },
                                             "amount": {
-                                                "type": "integer",
+                                                "type": "number",
                                                 "description": "The budget amount"
                                             }
                                         },
