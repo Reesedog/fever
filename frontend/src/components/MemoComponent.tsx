@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface Memo {
@@ -17,20 +17,63 @@ interface MemoComponentProps {
 }
 
 const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
+    const [socket, setSocket] = useState<WebSocket | null>(null);
+    const [currentFocusId, setCurrentFocusId] = useState<number | null>(null); // 新增状态变量
+
     useEffect(() => {
         axios.get('http://localhost:8000/api/memos/')
             .then(response => {
-                // Sort memos by created_at in descending order
-                const sortedMemos = response.data.sort((a: Memo, b: Memo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                const sortedMemos = response.data.sort(
+                    (a: Memo, b: Memo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                );
                 setMemos(sortedMemos);
             })
             .catch(error => console.log(error));
+
+        const ws = new WebSocket('ws://localhost:8000/ws/memo/');
+        setSocket(ws);
+
+        ws.onmessage = (event) => {
+            console.log('WebSocket message:', event.data);
+            const data = JSON.parse(event.data);
+            const { id, new_string } = data;
+            if (new_string === 'new_card') {
+                // 新建一个 memo 对象
+                setMemos(currentMemos => [
+                    ...currentMemos,
+                    {
+                        id: id,
+                        title: '',
+                        content: '',
+                        openai_response: '',
+                        parameter: '',
+                        created_at: new Date().toISOString()
+                    }
+                ]);
+                setCurrentFocusId(id); // 关注新创建的卡片
+            } else {
+                // 更新现有的 memo 对象
+                setMemos(currentMemos => currentMemos.map(memo => 
+                    memo.id === currentFocusId ? {...memo, content: `${memo.content} ${new_string}`} : memo
+                ));
+            }
+        };
+
+        ws.onclose = () => console.log('WebSocket disconnected');
+        ws.onerror = (event) => console.error('WebSocket error:', event);
+
+        return () => {
+            ws.close();
+        };
     }, [setMemos]);
 
     const handleDelete = async (memoId: number) => {
         try {
             await axios.delete(`http://localhost:8000/api/delete_memo/${memoId}/`);
             setMemos(memos.filter(memo => memo.id !== memoId));
+            if (currentFocusId === memoId) {
+                setCurrentFocusId(null); // 如果删除的是当前关注的卡片，则清除关注
+            }
         } catch (error) {
             console.log(error);
         }
@@ -70,7 +113,10 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
             <h1 className="text-3xl font-bold mb-6 text-center">Items</h1>
             <ul className="space-y-4">
                 {memos.map(memo => (
-                    <li key={memo.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <li 
+                        key={memo.id} 
+                        className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${memo.id === currentFocusId ? 'border-2 border-blue-500' : ''}`}
+                    >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold text-gray-800">{memo.title}</h2>
                             <button

@@ -30,7 +30,7 @@ const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
                 },
             });
             console.log('Memo created:', response.data);
-            setMemos([response.data, ...memos]); // 更新Memo列表
+            // setMemos([response.data, ...memos]); // 更新Memo列表
             setTitle('Test');
             setContent('');
         } catch (error) {
