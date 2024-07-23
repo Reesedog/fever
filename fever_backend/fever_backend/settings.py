@@ -84,7 +84,7 @@ CHANNEL_LAYERS = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000','http://34.152.37.120:3000/']
 
 ROOT_URLCONF = 'fever_backend.urls'
 

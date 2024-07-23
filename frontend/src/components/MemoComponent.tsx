@@ -55,7 +55,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
             } else {
                 console.log('Updating memo with id:', currentFocusId);
                 setMemos(currentMemos => currentMemos.map(memo => 
-                    memo.id === currentFocusId ? { ...memo, content: `${memo.content} ${new_string}` } : memo
+                    memo.id === currentFocusId ? { ...memo, openai_response: `${memo.openai_response} ${new_string}` } : memo
                 ));
             }
         };
