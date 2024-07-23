@@ -18,7 +18,7 @@ interface MemoComponentProps {
 
 const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [currentFocusId, setCurrentFocusId] = useState<number | null>(null); // 新增状态变量
+    const [currentFocusId, setCurrentFocusId] = useState<number | null>(null);
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/memos/')
@@ -34,13 +34,13 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
         setSocket(ws);
 
         ws.onmessage = (event) => {
-            console.log('WebSocket message:', event.data);
             const data = JSON.parse(event.data);
-            const { id, new_string } = data;
+            const { id, new_string } = data.message;
+            console.log('WebSocket message received:', { id, new_string });
+
             if (new_string === 'new_card') {
-                // 新建一个 memo 对象
+                console.log('New card detected:', id);
                 setMemos(currentMemos => [
-                    ...currentMemos,
                     {
                         id: id,
                         title: '',
@@ -48,13 +48,14 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                         openai_response: '',
                         parameter: '',
                         created_at: new Date().toISOString()
-                    }
+                    },
+                    ...currentMemos,
                 ]);
-                setCurrentFocusId(id); // 关注新创建的卡片
+                setCurrentFocusId(id);
             } else {
-                // 更新现有的 memo 对象
+                console.log('Updating memo with id:', currentFocusId);
                 setMemos(currentMemos => currentMemos.map(memo => 
-                    memo.id === currentFocusId ? {...memo, content: `${memo.content} ${new_string}`} : memo
+                    memo.id === currentFocusId ? { ...memo, content: `${memo.content} ${new_string}` } : memo
                 ));
             }
         };
@@ -65,14 +66,14 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
         return () => {
             ws.close();
         };
-    }, [setMemos]);
+    }, [setMemos, currentFocusId]);
 
     const handleDelete = async (memoId: number) => {
         try {
             await axios.delete(`http://localhost:8000/api/delete_memo/${memoId}/`);
             setMemos(memos.filter(memo => memo.id !== memoId));
             if (currentFocusId === memoId) {
-                setCurrentFocusId(null); // 如果删除的是当前关注的卡片，则清除关注
+                setCurrentFocusId(null);
             }
         } catch (error) {
             console.log(error);
@@ -128,7 +129,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                         </div>
                         <p className="text-gray-700 mb-4">{memo.content}</p>
                         <ReactMarkdown className="text-gray-600 mb-4">{memo.openai_response}</ReactMarkdown>
-                        {renderParameterTable(memo.parameter)}
                     </li>
                 ))}
             </ul>

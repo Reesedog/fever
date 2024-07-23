@@ -11,11 +11,10 @@ interface Memo {
 }
 
 interface MemoFormProps {
-    memos: Memo[];
-    setMemos: React.Dispatch<React.SetStateAction<Memo[]>>;
+   
 }
 
-const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
+const MemoForm: React.FC<MemoFormProps> = () => {
     const [title, setTitle] = useState('Test');
     const [content, setContent] = useState('');
 
@@ -29,7 +28,7 @@ const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log('Memo created:', response.data);
+            // console.log('Memo created:', response.data);
             // setMemos([response.data, ...memos]); // 更新Memo列表
             setTitle('Test');
             setContent('');
