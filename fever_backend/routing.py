@@ -1,11 +1,11 @@
-from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-import your_app.routing
+from channels.auth import AuthMiddlewareStack
+import memo.routing
 
 application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
+    "websocket": AuthMiddlewareStack(
         URLRouter(
-            fever.routing.websocket_urlpatterns
+            memo.routing.websocket_urlpatterns
         )
     ),
 })

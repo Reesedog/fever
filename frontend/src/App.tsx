@@ -1,25 +1,15 @@
-import React, { useState } from 'react';
-import MemoComponent from './components/MemoComponent';
-import MemoForm from './components/MemoForm';
+import React from 'react';
+import './App.css';
+import TextInputCard from './components/TextInputCard';
 
-interface Memo {
-    id: number;
-    title: string;
-    content: string;
-    openai_response: string;
-    parameter: string;
-    created_at: string;
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <TextInputCard />
+      </header>
+    </div>
+  );
 }
-
-const App: React.FC = () => {
-    const [memos, setMemos] = useState<Memo[]>([]);
-
-    return (
-        <div className="App">
-            <MemoForm memos={memos} setMemos={setMemos} />
-            <MemoComponent memos={memos} setMemos={setMemos} />
-        </div>
-    );
-};
 
 export default App;
