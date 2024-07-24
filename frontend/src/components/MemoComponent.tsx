@@ -36,8 +36,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const { id, new_string } = data.message;
-            console.log('WebSocket message received:', { id, new_string });
-
             if (new_string === 'new_card') {
                 console.log('New card detected:', id);
                 setMemos(currentMemos => [
@@ -53,9 +51,9 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                 ]);
                 setCurrentFocusId(id);
             } else {
-                console.log('Updating memo with id:', currentFocusId);
+                console.log(new_string)
                 setMemos(currentMemos => currentMemos.map(memo => 
-                    memo.id === currentFocusId ? { ...memo, openai_response: `${memo.openai_response} ${new_string}` } : memo
+                    memo.id === currentFocusId ? { ...memo, openai_response: `${memo.openai_response}${new_string}` } : memo
                 ));
             }
         };
@@ -104,7 +102,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                 </table>
             );
         } catch (error) {
-            console.error('Failed to parse parameter:', error);
             return null;
         }
     };
@@ -116,7 +113,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                 {memos.map(memo => (
                     <li 
                         key={memo.id} 
-                        className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${memo.id === currentFocusId ? 'border-2 border-blue-500' : ''}`}
+                        className={`bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 `}
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold text-gray-800">{memo.title}</h2>
@@ -129,6 +126,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                         </div>
                         <p className="text-gray-700 mb-4">{memo.content}</p>
                         <ReactMarkdown className="text-gray-600 mb-4">{memo.openai_response}</ReactMarkdown>
+                        {renderParameterTable(memo.parameter)}
                     </li>
                 ))}
             </ul>

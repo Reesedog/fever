@@ -16,7 +16,7 @@ const App: React.FC = () => {
 
     return (
         <div className="App">
-            <MemoForm />
+            <MemoForm  memos={memos} setMemos={setMemos} />
             <MemoComponent memos={memos} setMemos={setMemos} />
         </div>
     );
