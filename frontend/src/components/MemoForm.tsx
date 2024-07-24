@@ -29,7 +29,7 @@ const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log('Memo created:', response.data);
+            // console.log('Memo created:', response.data);
             setMemos([response.data, ...memos]); // 更新Memo列表
             setTitle('Test');
             setContent('');
