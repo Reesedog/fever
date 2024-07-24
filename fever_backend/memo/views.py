@@ -159,7 +159,13 @@ class MemoViewSet(viewsets.ModelViewSet):
         openai_response = event_handler.get_full_message()
         pattern = r'【[^】]*】'
         counter = [0]
-        openai_response = re.sub(pattern, lambda match: f'[{counter[0]}]' or counter.__setitem__(0, counter[0] + 1), openai_response)
+
+        def replace_function(match):
+            index = counter[0]
+            counter[0] += 1
+            return f'[{index}]'
+
+        openai_response = re.sub(pattern, replace_function, openai_response)
         memo.openai_response = openai_response
         memo.save()
         

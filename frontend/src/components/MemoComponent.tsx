@@ -124,8 +124,12 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                                 Delete
                             </button>
                         </div>
-                        <p className="text-gray-700 mb-4">{memo.content}</p>
-                        <ReactMarkdown className="text-gray-600 mb-4">{memo.openai_response}</ReactMarkdown>
+                        <div className="bg-gray-100 p-4 rounded mb-4">
+                            <p className="text-gray-700">{memo.content}</p>
+                        </div>
+                        <div className="bg-[#6b33ff] p-4 rounded mb-4">
+                            <ReactMarkdown className="text-white">{memo.openai_response}</ReactMarkdown>
+                        </div>
                         {renderParameterTable(memo.parameter)}
                     </li>
                 ))}
