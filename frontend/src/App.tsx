@@ -7,9 +7,7 @@ import EditMemo from './components/EditMemo';
 interface Memo {
     id: number;
     title: string;
-    content: string;
-    openai_response: string;
-    parameter: string;
+    thread_id: string | null; // updated to include null
     created_at: string;
 }
 
@@ -26,7 +24,7 @@ const App: React.FC = () => {
                             <MemoComponent memos={memos} setMemos={setMemos} />
                         </>
                     } />
-                    <Route path="/edit/:id" element={<EditMemo memos={memos} setMemos={setMemos} />} />
+                    <Route path="/edit/:id" element={<EditMemo/>} />
                 </Routes>
             </div>
         </Router>
