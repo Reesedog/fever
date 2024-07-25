@@ -21,7 +21,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
     const [currentFocusId, setCurrentFocusId] = useState<number | null>(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/memos/')
+        axios.get('http://34.152.37.120:8000/api/memos/')
             .then(response => {
                 const sortedMemos = response.data.sort(
                     (a: Memo, b: Memo) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -30,7 +30,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
             })
             .catch(error => console.log(error));
 
-        const ws = new WebSocket('ws://localhost:8000/ws/memo/');
+        const ws = new WebSocket('ws://34.152.37.120:8000/ws/memo/');
         setSocket(ws);
 
         ws.onmessage = (event) => {
@@ -68,7 +68,7 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
 
     const handleDelete = async (memoId: number) => {
         try {
-            await axios.delete(`http://localhost:8000/api/delete_memo/${memoId}/`);
+            await axios.delete(`http://34.152.37.120:8000/api/delete_memo/${memoId}/`);
             setMemos(memos.filter(memo => memo.id !== memoId));
             if (currentFocusId === memoId) {
                 setCurrentFocusId(null);

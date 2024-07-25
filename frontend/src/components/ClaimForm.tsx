@@ -22,7 +22,7 @@ const MemoForm: React.FC<MemoFormProps> = ({ memos, setMemos }) => {
         const newMemo = { title, content };
 
         try {
-            const response = await axios.post('http://localhost:8000/api/memos/', newMemo, {
+            const response = await axios.post('http://34.152.37.120:8000/api/memos/', newMemo, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
