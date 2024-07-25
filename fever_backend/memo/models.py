@@ -2,8 +2,8 @@ from django.db import models
 
 class Memo(models.Model):
     title = models.CharField(max_length=100)
-    content = models.TextField()
-    openai_response = models.TextField(blank=True, null=True)
+    conversation = models.JSONField(null=True, blank=True)
+    thread_id = models.CharField(max_length=100, null=True, blank=True)
     parameter = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

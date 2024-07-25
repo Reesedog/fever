@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 
 interface Memo {
@@ -19,6 +20,7 @@ interface MemoComponentProps {
 const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [currentFocusId, setCurrentFocusId] = useState<number | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get('http://localhost:8000/api/memos/')
@@ -37,7 +39,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
             const data = JSON.parse(event.data);
             const { id, new_string } = data.message;
             if (new_string === 'new_card') {
-                console.log('New card detected:', id);
                 setMemos(currentMemos => [
                     {
                         id: id,
@@ -51,7 +52,6 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                 ]);
                 setCurrentFocusId(id);
             } else {
-                console.log(new_string)
                 setMemos(currentMemos => currentMemos.map(memo => 
                     memo.id === currentFocusId ? { ...memo, openai_response: `${memo.openai_response}${new_string}` } : memo
                 ));
@@ -117,12 +117,20 @@ const MemoComponent: React.FC<MemoComponentProps> = ({ memos, setMemos }) => {
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-semibold text-gray-800">{memo.title}</h2>
-                            <button
-                                onClick={() => handleDelete(memo.id)}
-                                className="text-red-600 hover:text-red-800 transition-colors duration-200"
-                            >
-                                Delete
-                            </button>
+                            <div className="flex space-x-4">
+                                <button
+                                    onClick={() => handleDelete(memo.id)}
+                                    className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                                >
+                                    Delete
+                                </button>
+                                <button
+                                    onClick={() => navigate(`/edit/${memo.id}`)}
+                                    className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                                >
+                                    Edit
+                                </button>
+                            </div>
                         </div>
                         <div className="bg-gray-100 p-4 rounded mb-4">
                             <p className="text-gray-700">{memo.content}</p>

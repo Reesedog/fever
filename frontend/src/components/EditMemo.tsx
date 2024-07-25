@@ -17,7 +17,7 @@ interface EditMemoProps {
 
 const EditMemo: React.FC<EditMemoProps> = ({ memos, setMemos }) => {
     const { id } = useParams<{ id: string }>();
-    const memo = memos.find(memo => memo.id === parseInt(id));
+    const memo = memos.find(memo => memo.id === parseInt(id || ""));
 
     if (!memo) {
         return <div>Memo not found</div>;
@@ -25,9 +25,8 @@ const EditMemo: React.FC<EditMemoProps> = ({ memos, setMemos }) => {
 
     return (
         <div className="max-w-4xl mx-auto p-4">
-            <h2 className="text-3xl font-bold mb-6 text-center">Edit Memo</h2>
+            <h2 className="text-3xl font-bold mb-6 text-center">{memo.title}</h2>
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <p><strong>Title:</strong> {memo.title}</p>
                 <p><strong>Content:</strong> {memo.content}</p>
                 <p><strong>OpenAI Response:</strong> {memo.openai_response}</p>
                 <p><strong>Parameter:</strong> {memo.parameter}</p>
