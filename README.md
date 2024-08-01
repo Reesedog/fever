@@ -1,5 +1,4 @@
 # FEVER
-An AI assistant that can tell if a statement contradicts the knowledge base.
 Currently it is working as a NDIS plan making assistant for demo
 
 
